@@ -35,16 +35,19 @@ const dbVerbindung = mysql.createConnection({
     database: config.database.db
 })
 
+var kennung = config.kennung
+console.log("Kennung " + kennung)
+
 dbVerbindung.connect(function(fehler){
-    dbVerbindung.query('CREATE MKR kunde(fach VARCHAR(45), bildungsgang VARCHAR(45), hardwareausstattung, PRIMARY KEY(fach,bildungsgang));', function (fehler) {
+    dbVerbindung.query('CREATE table bildungsgangfach(fach VARCHAR(45), bildungsgang VARCHAR(45), hardwareausstattung VARCHAR(250), PRIMARY KEY(fach,bildungsgang));', function (fehler) {
         if (fehler) {
             if(fehler.code == "ER_TABLE_EXISTS_ERROR"){
-                console.log("Tabelle MKR existiert bereits und wird nicht angelegt.")
+                console.log("Tabelle bildungsgangfach existiert bereits und wird nicht angelegt.")
             }else{
                 console.log("Fehler: " + fehler )
             }
         }else{
-            console.log("Tabelle MKR erfolgreich angelegt.")
+            console.log("Tabelle bildunsgangfach erfolgreich angelegt.")
         }
     })
 })
@@ -59,10 +62,15 @@ app.post('/',(req, res, next) => {
     
     var änderung = false;
     
+    if(req.body.losung == kennung){            
+        console.log("Der Cookie wird gesetzt:")
+        res.cookie('istAutorisiert', kennwort)
+    }
+
     if(req.body.hardwareausstattung != bildungsgangfach.hardwareausstattung){
-      bildungsgangfach.Hardwareausstattung = req.body.hardwareausstattung  
-      änderung = true
-      console.log("Änderung: Hardware: " + req.body.hardwareausstattung )
+        bildungsgangfach.Hardwareausstattung = req.body.hardwareausstattung  
+        änderung = true
+        console.log("Änderung: Hardware: " + req.body.hardwareausstattung )
     }
 
     if(änderung){        
